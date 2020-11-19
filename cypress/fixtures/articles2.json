@@ -1,0 +1,19 @@
+{
+  "article": {
+    "title": "API_1",
+    "slug": "api_1-fyiikx",
+    "body": "API_1",
+    "createdAt": "2020-11-19T14:32:02.657Z",
+    "updatedAt": "2020-11-19T14:32:02.657Z",
+    "tagList": [],
+    "description": "API_1",
+    "author": {
+      "username": "ivan.aaa@gmail.com",
+      "bio": null,
+      "image": "https://static.productionready.io/images/smiley-cyrus.jpg",
+      "following": false
+    },
+    "favorited": true,
+    "favoritesCount": 3
+  }
+}
