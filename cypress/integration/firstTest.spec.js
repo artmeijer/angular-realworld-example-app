@@ -37,7 +37,7 @@ describe("Test with backend", () => {
       .and("contain", "testing");
   });
 
-  it.only("verify global feed likes count", () => {
+  it("verify global feed likes count", () => {
     cy.route("GET", "**/articles/feed", '{"articles":[],"articlesCount":0}');
     cy.route("GET", "**/articles*", "fixture:articles.json");
 
@@ -49,11 +49,58 @@ describe("Test with backend", () => {
 
     cy.fixture("articles").then((file) => {
       const articleLink = file.articles[1].slug;
-      cy.route('POST','**/articles/' + articleLink + '/favorite', file)
+      cy.route("POST", "**/articles/" + articleLink + "/favorite", file);
     });
 
-    cy.get('app-article-list button').eq(1).click().should('contain','6')
+    cy.get("app-article-list button").eq(1).click().should("contain", "6");
+  });
 
+  it.only("delete a new article in a global feed", () => {
+    const userCredentials = {
+      user: {
+        email: "nizaams@gmail.com",
+        password: "Titles82",
+      },
+    };
 
+    const bodyRequest = {
+      "article": {
+        "tagList": [],
+        "title": "Request from API",
+        "description": "API testing is easy",
+        "body": "Angular is cool"
+      }
+    }
+
+    cy.request(
+      "POST",
+      "https://conduit.productionready.io/api/users/login",
+      userCredentials
+    )
+      .its("body")
+      .then((body) => {
+        const token = body.user.token;
+
+        cy.request({
+          url: 'https://conduit.productionready.io/api/articles/',
+          headers: { 'Authorization' : 'Token ' + token},
+          method: 'POST',
+          body: bodyRequest
+        }).then(response => {
+          expect(response.status).to.equal(200)
+        })
+
+        cy.contains('Global Feed').click()
+        cy.get('.article-preview').first().click()
+        cy.get('.article-actions').contains('Delete Article').click()
+
+        cy.request({
+          url:'https://conduit.productionready.io/api/articles?limit=10&offset=0',
+          headers: { 'Authorization' : 'Token ' + token},
+          method: 'GET',
+        }).its('body').then(body => {
+          expect(body.articles[0].title).not.to.equal('Request from API')
+        })
+      });
   });
 });
